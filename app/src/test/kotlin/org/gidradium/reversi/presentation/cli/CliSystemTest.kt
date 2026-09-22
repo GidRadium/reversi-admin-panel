@@ -1,8 +1,8 @@
 package org.gidradium.reversi.presentation.cli
 
 import org.gidradium.reversi.application.AdminService
-import org.gidradium.reversi.infrastructure.memory.InMemoryGameRepository
-import org.gidradium.reversi.infrastructure.memory.InMemoryPlayerRepository
+import org.gidradium.reversi.application.repository.InMemoryGameRepository
+import org.gidradium.reversi.application.repository.InMemoryPlayerRepository
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 

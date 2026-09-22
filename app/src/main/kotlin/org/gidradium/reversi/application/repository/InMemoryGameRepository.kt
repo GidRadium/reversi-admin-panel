@@ -1,9 +1,8 @@
-package org.gidradium.reversi.infrastructure.memory
+package org.gidradium.reversi.application.repository
 
 import org.gidradium.reversi.application.GameId
 import org.gidradium.reversi.application.GameRecord
 import org.gidradium.reversi.application.PlayerId
-import org.gidradium.reversi.application.repository.IGameRepository
 import org.gidradium.reversi.game.GameSnapshot
 
 class InMemoryGameRepository : IGameRepository {

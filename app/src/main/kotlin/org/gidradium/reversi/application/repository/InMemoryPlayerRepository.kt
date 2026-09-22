@@ -1,7 +1,6 @@
-package org.gidradium.reversi.infrastructure.memory
+package org.gidradium.reversi.application.repository
 
 import org.gidradium.reversi.application.PlayerId
-import org.gidradium.reversi.application.repository.IPlayerRepository
 
 class InMemoryPlayerRepository : IPlayerRepository {
 

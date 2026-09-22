@@ -1,14 +1,12 @@
 package org.gidradium.reversi.application
 
-import org.gidradium.reversi.application.repository.IGameRepository
-import org.gidradium.reversi.application.repository.IPlayerRepository
 import org.gidradium.reversi.game.Board
 import org.gidradium.reversi.game.GameSnapshot
 import org.gidradium.reversi.game.GameStatus
 import org.gidradium.reversi.game.PlayerColor
 import org.gidradium.reversi.game.Position
-import org.gidradium.reversi.infrastructure.memory.InMemoryGameRepository
-import org.gidradium.reversi.infrastructure.memory.InMemoryPlayerRepository
+import org.gidradium.reversi.application.repository.InMemoryGameRepository
+import org.gidradium.reversi.application.repository.InMemoryPlayerRepository
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNull
