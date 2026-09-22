@@ -16,42 +16,40 @@ class InMemoryGameRepository : IGameRepository {
         blackPlayerId: PlayerId,
         snapshot: GameSnapshot
     ): GameId {
-        val id = GameId(nextId++)
+        val gameId = GameId(nextId++)
 
-        games[id] = GameRecord(
-            id = id,
+        games[gameId] = GameRecord(
+            id = gameId,
             whitePlayerId = whitePlayerId,
             blackPlayerId = blackPlayerId,
             snapshot = snapshot
         )
 
-        return id
+        return gameId
     }
 
     override fun update(
-        id: GameId,
+        gameId: GameId,
         snapshot: GameSnapshot
     ) {
-        val game = requireNotNull(games[id]) {
-            "Game with id ${id.value} does not exist"
+        val game = requireNotNull(games[gameId]) {
+            "Game with id ${gameId.value} does not exist"
         }
 
-        games[id] = game.copy(
+        games[gameId] = game.copy(
             snapshot = snapshot
         )
     }
 
-    override fun findById(id: GameId): GameRecord? {
-        return games[id]
-    }
+    override fun findById(gameId: GameId): GameRecord? =
+        games[gameId]
 
-    override fun findAll(): List<GameRecord> {
-        return games.values.toList()
-    }
+    override fun findAll(): List<GameRecord> =
+        games.values.toList()
 
-    override fun delete(id: GameId) {
-        require(games.remove(id) != null) {
-            "Game with id ${id.value} does not exist"
+    override fun delete(gameId: GameId) {
+        require(games.remove(gameId) != null) {
+            "Game with id ${gameId.value} does not exist"
         }
     }
 }

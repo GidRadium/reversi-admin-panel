@@ -6,9 +6,8 @@ class FakeCliIO(
 
     val outputs = mutableListOf<String>()
 
-    override fun readLine(): String? {
-        return inputs.removeFirstOrNull()
-    }
+    override fun readLine(): String? =
+        inputs.removeFirstOrNull()
 
     override fun write(message: String) {
         outputs += message

@@ -6,6 +6,7 @@ import org.gidradium.reversi.application.PlayerId
 import org.gidradium.reversi.game.GameSnapshot
 
 interface IGameRepository {
+
     fun create(
         whitePlayerId: PlayerId,
         blackPlayerId: PlayerId,
@@ -13,13 +14,13 @@ interface IGameRepository {
     ): GameId
 
     fun update(
-        id: GameId,
+        gameId: GameId,
         snapshot: GameSnapshot
     )
 
-    fun findById(id: GameId): GameRecord?
+    fun findById(gameId: GameId): GameRecord?
 
     fun findAll(): List<GameRecord>
 
-    fun delete(id: GameId)
+    fun delete(gameId: GameId)
 }

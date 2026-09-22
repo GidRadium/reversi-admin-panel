@@ -1,7 +1,5 @@
 package org.gidradium.reversi.game
 
-import kotlin.collections.plusAssign
-
 class Game(
     private val rules: ReversiRules = ReversiRules()
 ) {
@@ -47,11 +45,12 @@ class Game(
         }
 
         val playerWhoMoved = currentPlayer
+        val playerCell = playerWhoMoved.toCell()
 
-        board[position] = playerWhoMoved.toCell()
+        board[position] = playerCell
 
         for (flippedCell in evaluation.flippedCells) {
-            board[flippedCell] = playerWhoMoved.toCell()
+            board[flippedCell] = playerCell
         }
 
         history += Move(
@@ -71,20 +70,18 @@ class Game(
         return evaluation
     }
 
-    fun snapshot(): GameSnapshot {
-        return GameSnapshot(
+    fun snapshot(): GameSnapshot =
+        GameSnapshot(
             board = board.snapshot(),
             currentPlayer = currentPlayer,
             history = history.toList(),
             status = status,
             winner = winner
         )
-    }
 
-    private fun PlayerColor.toCell(): Cell {
-        return when (this) {
+    private fun PlayerColor.toCell(): Cell =
+        when (this) {
             PlayerColor.BLACK -> Cell.BLACK
             PlayerColor.WHITE -> Cell.WHITE
         }
-    }
 }

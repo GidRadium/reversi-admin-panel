@@ -16,37 +16,34 @@ class AdminService(
 
     private val activeGames = mutableMapOf<GameId, Game>()
 
-    // ---------- Players ----------
+    fun createPlayer(name: String): PlayerId =
+        playerRepository.create(name)
 
-    fun createPlayer(name: String): PlayerId = playerRepository.create(name)
+    fun getPlayer(playerId: PlayerId): String? =
+        playerRepository.findById(playerId)
 
-    fun getPlayer(id: PlayerId): String? {
-        return playerRepository.findById(id)
-    }
+    fun getPlayers(): Map<PlayerId, String> =
+        playerRepository.findAll()
 
-    fun getPlayers(): Map<PlayerId, String> {
-        return playerRepository.findAll()
-    }
-
-    fun deletePlayer(id: PlayerId) {
-        requireNotNull(playerRepository.findById(id)) {
-            "Player with id ${id.value} does not exist"
+    fun deletePlayer(playerId: PlayerId) {
+        requireNotNull(playerRepository.findById(playerId)) {
+            "Player with id ${playerId.value} does not exist"
         }
 
-        val participatesInGame = gameRepository.findAll().any {
-            it.whitePlayerId == id || it.blackPlayerId == id
+        val isParticipatingInGame = gameRepository.findAll().any {
+            it.whitePlayerId == playerId || it.blackPlayerId == playerId
         }
 
-        require(!participatesInGame) {
+        require(!isParticipatingInGame) {
             "Player cannot be deleted because they participate in a game"
         }
 
-        playerRepository.delete(id)
+        playerRepository.delete(playerId)
     }
 
-    fun getPlayerStatistics(id: PlayerId): PlayerStatistics {
-        requireNotNull(playerRepository.findById(id)) {
-            "Player with id ${id.value} does not exist"
+    fun getPlayerStatistics(playerId: PlayerId): PlayerStatistics {
+        requireNotNull(playerRepository.findById(playerId)) {
+            "Player with id ${playerId.value} does not exist"
         }
 
         var gamesPlayed = 0
@@ -55,7 +52,7 @@ class AdminService(
         var draws = 0
 
         for (game in gameRepository.findAll()) {
-            val color = when (id) {
+            val color = when (playerId) {
                 game.whitePlayerId -> PlayerColor.WHITE
                 game.blackPlayerId -> PlayerColor.BLACK
                 else -> continue
@@ -63,11 +60,13 @@ class AdminService(
 
             gamesPlayed++
 
-            if (game.snapshot.status != GameStatus.FINISHED) {
+            val snapshot = game.snapshot
+
+            if (snapshot.status != GameStatus.FINISHED) {
                 continue
             }
 
-            when (game.snapshot.winner) {
+            when (snapshot.winner) {
                 null -> draws++
                 color -> wins++
                 else -> losses++
@@ -81,8 +80,6 @@ class AdminService(
             draws = draws
         )
     }
-
-    // ---------- Games ----------
 
     fun createGame(
         whitePlayerId: PlayerId,
@@ -113,33 +110,31 @@ class AdminService(
         return gameId
     }
 
-    fun deleteGame(id: GameId) {
-        requireNotNull(gameRepository.findById(id)) {
-            "Game with id ${id.value} does not exist"
+    fun deleteGame(gameId: GameId) {
+        requireNotNull(gameRepository.findById(gameId)) {
+            "Game with id ${gameId.value} does not exist"
         }
 
-        activeGames.remove(id)
-        gameRepository.delete(id)
+        activeGames.remove(gameId)
+        gameRepository.delete(gameId)
     }
 
     fun validateMove(
         gameId: GameId,
         position: Position
-    ): MoveEvaluation {
-        return getActiveGame(gameId).validateMove(position)
-    }
+    ): MoveEvaluation =
+        getActiveGame(gameId).validateMove(position)
 
     fun makeMove(
         gameId: GameId,
         position: Position
     ): MoveEvaluation {
         val game = getActiveGame(gameId)
-
         val result = game.makeMove(position)
 
         if (result.isValid) {
             gameRepository.update(
-                id = gameId,
+                gameId = gameId,
                 snapshot = game.snapshot()
             )
         }
@@ -147,20 +142,25 @@ class AdminService(
         return result
     }
 
-    fun getAvailableMoves(gameId: GameId): Set<Position> {
-        return getActiveGame(gameId).availableMoves()
-    }
+    fun getAvailableMoves(gameId: GameId): Set<Position> =
+        getActiveGame(gameId).availableMoves()
 
-    fun getGameSnapshot(gameId: GameId): GameSnapshot {
-        return getActiveGame(gameId).snapshot()
-    }
+    fun getGameSnapshot(gameId: GameId): GameSnapshot =
+        getActiveGame(gameId).snapshot()
 
     fun getGameRecord(gameId: GameId): GameRecord {
         val record = requireNotNull(gameRepository.findById(gameId)) {
             "Game with id ${gameId.value} does not exist"
         }
 
-        val activeGame = activeGames[gameId]
+        return currentGameRecord(record)
+    }
+
+    fun getGames(): List<GameRecord> =
+        gameRepository.findAll().map(::currentGameRecord)
+
+    private fun currentGameRecord(record: GameRecord): GameRecord {
+        val activeGame = activeGames[record.id]
 
         return if (activeGame == null) {
             record
@@ -171,23 +171,8 @@ class AdminService(
         }
     }
 
-    fun getGames(): List<GameRecord> {
-        return gameRepository.findAll().map { record ->
-            val activeGame = activeGames[record.id]
-
-            if (activeGame == null) {
-                record
-            } else {
-                record.copy(
-                    snapshot = activeGame.snapshot()
-                )
-            }
-        }
-    }
-
-    private fun getActiveGame(gameId: GameId): Game {
-        return requireNotNull(activeGames[gameId]) {
+    private fun getActiveGame(gameId: GameId): Game =
+        requireNotNull(activeGames[gameId]) {
             "Game with id ${gameId.value} is not active"
         }
-    }
 }

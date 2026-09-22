@@ -13,22 +13,21 @@ class InMemoryPlayerRepository : IPlayerRepository {
             "Player name must not be blank"
         }
 
-        val id = PlayerId(nextId++)
-        players[id] = name
-        return id
+        val playerId = PlayerId(nextId++)
+        players[playerId] = name
+
+        return playerId
     }
 
-    override fun findById(id: PlayerId): String? {
-        return players[id]
-    }
+    override fun findById(playerId: PlayerId): String? =
+        players[playerId]
 
-    override fun findAll(): Map<PlayerId, String> {
-        return players.toMap()
-    }
+    override fun findAll(): Map<PlayerId, String> =
+        players.toMap()
 
-    override fun delete(id: PlayerId) {
-        require(players.remove(id) != null) {
-            "Player $id not found"
+    override fun delete(playerId: PlayerId) {
+        require(players.remove(playerId) != null) {
+            "Player with id ${playerId.value} does not exist"
         }
     }
 }

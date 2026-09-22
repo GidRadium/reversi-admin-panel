@@ -16,10 +16,9 @@ class ReversiRules {
 
         val playerCell = player.toCell()
         val opponentCell = player.opponent().toCell()
-
         val flippedCells = mutableListOf<Position>()
 
-        for ((rowDelta, columnDelta) in DIRECTIONS) {
+        for ((rowDelta, columnDelta) in directions) {
             flippedCells += findFlipsInDirection(
                 board = board,
                 position = position,
@@ -144,22 +143,20 @@ class ReversiRules {
         }
     }
 
-    private fun PlayerColor.toCell(): Cell {
-        return when (this) {
+    private fun PlayerColor.toCell(): Cell =
+        when (this) {
             PlayerColor.BLACK -> Cell.BLACK
             PlayerColor.WHITE -> Cell.WHITE
         }
-    }
 
-    private fun PlayerColor.opponent(): PlayerColor {
-        return when (this) {
+    private fun PlayerColor.opponent(): PlayerColor =
+        when (this) {
             PlayerColor.BLACK -> PlayerColor.WHITE
             PlayerColor.WHITE -> PlayerColor.BLACK
         }
-    }
 
     companion object {
-        private val DIRECTIONS = listOf(
+        private val directions = listOf(
             -1 to -1,
             -1 to 0,
             -1 to 1,
