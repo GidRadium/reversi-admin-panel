@@ -2,24 +2,24 @@
 CLI and GUI reversi games validator. Written in Kotlin.
 
 
-#### Clone
+### Clone
 ```bash
 git clone https://github.com/GidRadium/reversi-admin-panel.git
 cd reversi-admin-panel
 ```
 
-#### Build
+### Build
 ```bash
 ./gradlew build
 ```
 
-#### Run
+### Run
 ```bash
 ./gradlew installDist
 ./app/build/install/app/bin/app
 ```
 
-#### Test
+### Test
 ```bash
 ./gradlew test
 ```

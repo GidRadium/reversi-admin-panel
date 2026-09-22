@@ -1,3 +1,4 @@
+```mermaid
 classDiagram
 
 class PlayerId {
@@ -93,3 +94,4 @@ Board --> Position
 MoveEvaluation --> Position
 GameProgress --> PlayerColor
 GameProgress --> GameStatus
+```
