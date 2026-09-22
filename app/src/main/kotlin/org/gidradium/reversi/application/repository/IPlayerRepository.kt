@@ -6,4 +6,5 @@ interface IPlayerRepository {
     fun create(name: String): Player
     fun findById(id: Int): Player?
     fun findAll(): List<Player>
+    fun delete(id: Int)
 }

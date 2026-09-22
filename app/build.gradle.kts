@@ -29,3 +29,7 @@ tasks.named<Test>("test") {
         events("passed", "skipped", "failed")
     }
 }
+
+tasks.named<JavaExec>("run") {
+    standardInput = System.`in`
+}

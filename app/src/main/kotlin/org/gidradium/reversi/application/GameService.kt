@@ -43,6 +43,15 @@ class GameService(
         return gameId
     }
 
+    fun deleteGame(gameId: Int) {
+        requireNotNull(gameRepository.findById(gameId)) {
+            "Game with id $gameId does not exist"
+        }
+
+        activeGames.remove(gameId)
+        gameRepository.delete(gameId)
+    }
+
     fun validateMove(
         gameId: Int,
         position: Position
@@ -55,6 +64,7 @@ class GameService(
         position: Position
     ): MoveEvaluation {
         val game = getGame(gameId)
+
         val result = game.makeMove(position)
 
         if (result.isValid) {
@@ -73,6 +83,33 @@ class GameService(
 
     fun getGameSnapshot(gameId: Int): GameSnapshot {
         return getGame(gameId).snapshot()
+    }
+
+    fun getGameInfo(gameId: Int): GameInfo {
+        val storedGame = requireNotNull(gameRepository.findById(gameId)) {
+            "Game with id $gameId does not exist"
+        }
+
+        val snapshot = activeGames[gameId]?.snapshot() ?: storedGame.snapshot
+
+        return GameInfo(
+            id = storedGame.id,
+            whitePlayerId = storedGame.whitePlayerId,
+            blackPlayerId = storedGame.blackPlayerId,
+            snapshot = snapshot
+        )
+    }
+
+    fun getAllGames(): List<GameInfo> {
+        return gameRepository.findAll().map { storedGame ->
+            GameInfo(
+                id = storedGame.id,
+                whitePlayerId = storedGame.whitePlayerId,
+                blackPlayerId = storedGame.blackPlayerId,
+                snapshot = activeGames[storedGame.id]?.snapshot()
+                    ?: storedGame.snapshot
+            )
+        }
     }
 
     private fun getGame(gameId: Int): Game {

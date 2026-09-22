@@ -27,4 +27,10 @@ class InMemoryPlayerRepository : IPlayerRepository {
     override fun findAll(): List<Player> {
         return players.values.toList()
     }
+
+    override fun delete(id: Int) {
+        require(players.remove(id) != null) {
+            "Player with id $id does not exist"
+        }
+    }
 }

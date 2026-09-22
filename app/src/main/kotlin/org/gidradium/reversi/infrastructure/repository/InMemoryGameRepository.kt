@@ -43,4 +43,10 @@ class InMemoryGameRepository : IGameRepository {
     override fun findAll(): List<StoredGame> {
         return games.values.toList()
     }
+
+    override fun delete(id: Int) {
+        require(games.remove(id) != null) {
+            "Game with id $id does not exist"
+        }
+    }
 }

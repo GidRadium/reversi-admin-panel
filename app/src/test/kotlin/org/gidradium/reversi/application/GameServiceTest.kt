@@ -17,12 +17,8 @@ class GameServiceTest {
     private val playerRepository = InMemoryPlayerRepository()
     private val gameRepository = InMemoryGameRepository()
 
-    private val playerService = PlayerService(playerRepository)
-
-    private val gameService = GameService(
-        playerRepository = playerRepository,
-        gameRepository = gameRepository
-    )
+    private val playerService = PlayerService(playerRepository, gameRepository)
+    private val gameService = GameService(playerRepository, gameRepository)
 
     private val whitePlayer = playerService.createPlayer("Alice")
     private val blackPlayer = playerService.createPlayer("Bob")

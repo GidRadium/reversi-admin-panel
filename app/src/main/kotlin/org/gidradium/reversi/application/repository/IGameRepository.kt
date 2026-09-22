@@ -21,4 +21,6 @@ interface IGameRepository {
     fun findById(id: Int): StoredGame?
 
     fun findAll(): List<StoredGame>
+
+    fun delete(id: Int)
 }

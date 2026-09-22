@@ -1,14 +1,16 @@
 package org.gidradium.reversi.application
 
 import org.gidradium.reversi.infrastructure.repository.InMemoryPlayerRepository
+import org.gidradium.reversi.infrastructure.repository.InMemoryGameRepository
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 
 class PlayerServiceTest {
 
-    private val repository = InMemoryPlayerRepository()
-    private val service = PlayerService(repository)
+    private val playerRepository = InMemoryPlayerRepository()
+    private val gameRepository = InMemoryGameRepository()
+    private val service = PlayerService(playerRepository, gameRepository)
 
     @Test
     fun `creates player`() {
