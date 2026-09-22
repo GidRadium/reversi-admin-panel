@@ -1,9 +1,8 @@
 package org.gidradium.reversi.presentation.cli
 
-import org.gidradium.reversi.application.GameService
-import org.gidradium.reversi.application.PlayerService
-import org.gidradium.reversi.infrastructure.repository.InMemoryGameRepository
-import org.gidradium.reversi.infrastructure.repository.InMemoryPlayerRepository
+import org.gidradium.reversi.application.AdminService
+import org.gidradium.reversi.infrastructure.memory.InMemoryGameRepository
+import org.gidradium.reversi.infrastructure.memory.InMemoryPlayerRepository
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
@@ -14,12 +13,7 @@ class CliSystemTest {
         val playerRepository = InMemoryPlayerRepository()
         val gameRepository = InMemoryGameRepository()
 
-        val playerService = PlayerService(
-            playerRepository = playerRepository,
-            gameRepository = gameRepository
-        )
-
-        val gameService = GameService(
+        val service = AdminService(
             playerRepository = playerRepository,
             gameRepository = gameRepository
         )
@@ -36,25 +30,32 @@ class CliSystemTest {
         )
 
         Cli(
-            playerService = playerService,
-            gameService = gameService,
+            adminService = service,
             io = io
         ).run()
 
         assertTrue(
-            io.outputs.any { it.contains("Created player #1: Alice") }
+            io.outputs.any {
+                it.contains("Created player #1: Alice")
+            }
         )
 
         assertTrue(
-            io.outputs.any { it.contains("Created player #2: Bob") }
+            io.outputs.any {
+                it.contains("Created player #2: Bob")
+            }
         )
 
         assertTrue(
-            io.outputs.any { it.contains("Created game #1") }
+            io.outputs.any {
+                it.contains("Created game #1")
+            }
         )
 
         assertTrue(
-            io.outputs.any { it.contains("Move D3 accepted.") }
+            io.outputs.any {
+                it.contains("Move D3 accepted.")
+            }
         )
     }
 }

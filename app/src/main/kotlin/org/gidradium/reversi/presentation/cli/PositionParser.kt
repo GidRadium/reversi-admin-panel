@@ -1,6 +1,6 @@
 package org.gidradium.reversi.presentation.cli
 
-import org.gidradium.reversi.domain.game.Position
+import org.gidradium.reversi.game.Position
 
 object PositionParser {
 

@@ -1,26 +1,25 @@
 package org.gidradium.reversi.application.repository
 
-import org.gidradium.reversi.domain.game.GameSnapshot
-
-data class StoredGame(
-    val id: Int,
-    val whitePlayerId: Int,
-    val blackPlayerId: Int,
-    val snapshot: GameSnapshot
-)
+import org.gidradium.reversi.application.GameId
+import org.gidradium.reversi.application.GameRecord
+import org.gidradium.reversi.application.PlayerId
+import org.gidradium.reversi.game.GameSnapshot
 
 interface IGameRepository {
     fun create(
-        whitePlayerId: Int,
-        blackPlayerId: Int,
+        whitePlayerId: PlayerId,
+        blackPlayerId: PlayerId,
         snapshot: GameSnapshot
-    ): Int
+    ): GameId
 
-    fun update(id: Int, snapshot: GameSnapshot)
+    fun update(
+        id: GameId,
+        snapshot: GameSnapshot
+    )
 
-    fun findById(id: Int): StoredGame?
+    fun findById(id: GameId): GameRecord?
 
-    fun findAll(): List<StoredGame>
+    fun findAll(): List<GameRecord>
 
-    fun delete(id: Int)
+    fun delete(id: GameId)
 }

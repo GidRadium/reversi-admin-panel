@@ -1,4 +1,4 @@
-package org.gidradium.reversi.domain.game
+package org.gidradium.reversi.game
 
 data class GameSnapshot(
     val board: List<List<Cell>>,

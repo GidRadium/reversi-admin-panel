@@ -1,6 +1,6 @@
 package org.gidradium.reversi.presentation.cli
 
-import org.gidradium.reversi.domain.game.Position
+import org.gidradium.reversi.game.Position
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.Test

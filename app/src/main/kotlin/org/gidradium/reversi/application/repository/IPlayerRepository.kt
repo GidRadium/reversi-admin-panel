@@ -1,10 +1,10 @@
 package org.gidradium.reversi.application.repository
 
-import org.gidradium.reversi.domain.player.Player
+import org.gidradium.reversi.application.PlayerId
 
 interface IPlayerRepository {
-    fun create(name: String): Player
-    fun findById(id: Int): Player?
-    fun findAll(): List<Player>
-    fun delete(id: Int)
+    fun create(name: String): PlayerId
+    fun findById(id: PlayerId): String?
+    fun findAll(): Map<PlayerId, String>
+    fun delete(id: PlayerId)
 }

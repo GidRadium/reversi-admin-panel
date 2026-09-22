@@ -1,4 +1,4 @@
-package org.gidradium.reversi.domain.game
+package org.gidradium.reversi.game
 
 enum class Cell {
     EMPTY,

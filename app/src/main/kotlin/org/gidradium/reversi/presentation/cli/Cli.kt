@@ -1,16 +1,15 @@
 package org.gidradium.reversi.presentation.cli
 
-import org.gidradium.reversi.application.GameInfo
-import org.gidradium.reversi.application.GameService
-import org.gidradium.reversi.application.PlayerService
-import org.gidradium.reversi.domain.game.Cell
-import org.gidradium.reversi.domain.game.GameStatus
-import org.gidradium.reversi.domain.game.PlayerColor
-import org.gidradium.reversi.domain.game.Position
+import org.gidradium.reversi.application.AdminService
+import org.gidradium.reversi.application.GameId
+import org.gidradium.reversi.application.GameRecord
+import org.gidradium.reversi.application.PlayerId
+import org.gidradium.reversi.game.Cell
+import org.gidradium.reversi.game.GameStatus
+import org.gidradium.reversi.game.Position
 
 class Cli(
-    private val playerService: PlayerService,
-    private val gameService: GameService,
+    private val adminService: AdminService,
     private val io: ICliIO
 ) {
 
@@ -76,24 +75,25 @@ class Cli(
         io.writeLine("  gc <whiteId> <blackId> - game-create")
         io.writeLine("  gd <gameId>            - game-delete")
         io.writeLine("  gm <gameId> <position> - game-move")
-        io.writeLine("  gi <gameId>            - game-info")
-        io.writeLine("  gb <gameId>            - game-board")
-        io.writeLine("  gv <gameId>            - game-variants")
-        io.writeLine("  gh <gameId>            - game-history")
-        io.writeLine("  gl                     - games-list")
+        io.writeLine("  gi <gameId>             - game-info")
+        io.writeLine("  gb <gameId>             - game-board")
+        io.writeLine("  gv <gameId>             - game-variants")
+        io.writeLine("  gh <gameId>             - game-history")
+        io.writeLine("  gl                      - games-list")
 
-        io.writeLine("  exit                   - exit")
+        io.writeLine("  exit                    - exit")
     }
 
     private fun createPlayer(parts: List<String>) {
-        require(parts.size == 2) {
+        require(parts.size >= 2) {
             "Usage: pc <name>"
         }
 
-        val player = playerService.createPlayer(parts[1])
+        val name = parts.drop(1).joinToString(" ")
+        val playerId = adminService.createPlayer(name)
 
         io.writeLine(
-            "Created player #${player.id}: ${player.name}"
+            "Created player #${playerId.value}: $name"
         )
     }
 
@@ -102,11 +102,11 @@ class Cli(
             "Usage: pd <playerId>"
         }
 
-        val id = parts[1].toInt()
+        val id = PlayerId(parts[1].toInt())
 
-        playerService.deletePlayer(id)
+        adminService.deletePlayer(id)
 
-        io.writeLine("Deleted player #$id")
+        io.writeLine("Deleted player #${id.value}")
     }
 
     private fun showPlayerInfo(parts: List<String>) {
@@ -114,15 +114,15 @@ class Cli(
             "Usage: pi <playerId>"
         }
 
-        val id = parts[1].toInt()
+        val id = PlayerId(parts[1].toInt())
 
-        val player = requireNotNull(playerService.getPlayer(id)) {
-            "Player with id $id does not exist"
+        val playerName = requireNotNull(adminService.getPlayer(id)) {
+            "Player with id ${id.value} does not exist"
         }
 
-        val statistics = playerService.getStatistics(id)
+        val statistics = adminService.getPlayerStatistics(id)
 
-        io.writeLine("Player #${player.id}: ${player.name}")
+        io.writeLine("Player #${id.value}: $playerName")
         io.writeLine("Games: ${statistics.gamesPlayed}")
         io.writeLine("Wins: ${statistics.wins}")
         io.writeLine("Losses: ${statistics.losses}")
@@ -130,7 +130,7 @@ class Cli(
     }
 
     private fun showPlayers() {
-        val players = playerService.getAllPlayers()
+        val players = adminService.getPlayers()
 
         if (players.isEmpty()) {
             io.writeLine("No players.")
@@ -138,7 +138,7 @@ class Cli(
         }
 
         for ((id, name) in players) {
-            io.writeLine("#$id: $name")
+            io.writeLine("#${id.value}: $name")
         }
     }
 
@@ -147,15 +147,15 @@ class Cli(
             "Usage: gc <whitePlayerId> <blackPlayerId>"
         }
 
-        val whiteId = parts[1].toInt()
-        val blackId = parts[2].toInt()
+        val whiteId = PlayerId(parts[1].toInt())
+        val blackId = PlayerId(parts[2].toInt())
 
-        val gameId = gameService.createGame(
+        val gameId = adminService.createGame(
             whitePlayerId = whiteId,
             blackPlayerId = blackId
         )
 
-        io.writeLine("Created game #$gameId")
+        io.writeLine("Created game #${gameId.value}")
     }
 
     private fun deleteGame(parts: List<String>) {
@@ -163,11 +163,11 @@ class Cli(
             "Usage: gd <gameId>"
         }
 
-        val id = parts[1].toInt()
+        val id = GameId(parts[1].toInt())
 
-        gameService.deleteGame(id)
+        adminService.deleteGame(id)
 
-        io.writeLine("Deleted game #$id")
+        io.writeLine("Deleted game #${id.value}")
     }
 
     private fun makeMove(parts: List<String>) {
@@ -175,10 +175,10 @@ class Cli(
             "Usage: gm <gameId> <position>"
         }
 
-        val gameId = parts[1].toInt()
+        val gameId = GameId(parts[1].toInt())
         val position = PositionParser.parse(parts[2])
 
-        val result = gameService.makeMove(
+        val result = adminService.makeMove(
             gameId = gameId,
             position = position
         )
@@ -199,7 +199,9 @@ class Cli(
             "Usage: gi <gameId>"
         }
 
-        val game = gameService.getGameInfo(parts[1].toInt())
+        val game = adminService.getGameRecord(
+            GameId(parts[1].toInt())
+        )
 
         showGameHeader(game)
 
@@ -224,7 +226,9 @@ class Cli(
             "Usage: gb <gameId>"
         }
 
-        val game = gameService.getGameInfo(parts[1].toInt())
+        val game = adminService.getGameRecord(
+            GameId(parts[1].toInt())
+        )
 
         printBoard(game.snapshot.board)
     }
@@ -234,9 +238,10 @@ class Cli(
             "Usage: gv <gameId>"
         }
 
-        val gameId = parts[1].toInt()
-        val game = gameService.getGameInfo(gameId)
-        val availableMoves = gameService.getAvailableMoves(gameId)
+        val gameId = GameId(parts[1].toInt())
+
+        val game = adminService.getGameRecord(gameId)
+        val availableMoves = adminService.getAvailableMoves(gameId)
 
         printBoard(
             board = game.snapshot.board,
@@ -249,7 +254,9 @@ class Cli(
             "Usage: gh <gameId>"
         }
 
-        val game = gameService.getGameInfo(parts[1].toInt())
+        val game = adminService.getGameRecord(
+            GameId(parts[1].toInt())
+        )
 
         if (game.snapshot.history.isEmpty()) {
             io.writeLine("No moves.")
@@ -265,7 +272,7 @@ class Cli(
     }
 
     private fun showGames() {
-        val games = gameService.getAllGames()
+        val games = adminService.getGames()
 
         if (games.isEmpty()) {
             io.writeLine("No games.")
@@ -273,30 +280,34 @@ class Cli(
         }
 
         for (game in games) {
-            val white = playerService.getPlayer(game.whitePlayerId)
-            val black = playerService.getPlayer(game.blackPlayerId)
+            val white = adminService.getPlayer(game.whitePlayerId)
+            val black = adminService.getPlayer(game.blackPlayerId)
 
             io.writeLine(
-                "#${game.id}: " +
-                        "${white?.name ?: "Unknown"} vs " +
-                        "${black?.name ?: "Unknown"}"
+                "#${game.id.value}: " +
+                        "${white ?: "Unknown"} vs " +
+                        "${black ?: "Unknown"}"
             )
         }
     }
 
-    private fun showGameHeader(game: GameInfo) {
-        val white = playerService.getPlayer(game.whitePlayerId)
-        val black = playerService.getPlayer(game.blackPlayerId)
+    private fun showGameHeader(game: GameRecord) {
+        val white = adminService.getPlayer(game.whitePlayerId)
+        val black = adminService.getPlayer(game.blackPlayerId)
 
-        io.writeLine("Game #${game.id}")
+        io.writeLine("Game #${game.id.value}")
         io.writeLine(
-            "White: #${game.whitePlayerId} ${white?.name ?: "Unknown"}"
+            "White: #${game.whitePlayerId.value} " +
+                    "${white ?: "Unknown"}"
         )
         io.writeLine(
-            "Black: #${game.blackPlayerId} ${black?.name ?: "Unknown"}"
+            "Black: #${game.blackPlayerId.value} " +
+                    "${black ?: "Unknown"}"
         )
         io.writeLine("Status: ${game.snapshot.status}")
-        io.writeLine("Current player: ${game.snapshot.currentPlayer}")
+        io.writeLine(
+            "Current player: ${game.snapshot.currentPlayer}"
+        )
 
         if (game.snapshot.status == GameStatus.FINISHED) {
             io.writeLine(

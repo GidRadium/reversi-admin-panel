@@ -1,4 +1,4 @@
-package org.gidradium.reversi.domain.game
+package org.gidradium.reversi.game
 
 import kotlin.collections.plusAssign
 

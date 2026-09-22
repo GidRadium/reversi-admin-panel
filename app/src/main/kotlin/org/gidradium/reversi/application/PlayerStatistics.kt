@@ -1,4 +1,4 @@
-package org.gidradium.reversi.domain.player
+package org.gidradium.reversi.application
 
 data class PlayerStatistics(
     val gamesPlayed: Int,
