@@ -24,4 +24,8 @@ application {
 
 tasks.named<Test>("test") {
     useJUnitPlatform()
+
+    testLogging {
+        events("passed", "skipped", "failed")
+    }
 }
