@@ -1,4 +1,4 @@
-package org.gidradium.reversi.domain
+package org.gidradium.reversi.domain.player
 
 data class Player(
     val id: Int,

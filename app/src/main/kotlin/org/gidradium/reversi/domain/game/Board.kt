@@ -1,4 +1,4 @@
-package org.gidradium.reversi.domain
+package org.gidradium.reversi.domain.game
 
 class Board {
 
@@ -18,6 +18,16 @@ class Board {
 
     internal operator fun set(position: Position, cell: Cell) {
         cells[position.row][position.column] = cell
+    }
+
+    fun count(cell: Cell): Int {
+        return cells.sumOf { row ->
+            row.count { it == cell }
+        }
+    }
+
+    fun snapshot(): List<List<Cell>> {
+        return cells.map { it.toList() }
     }
 
     companion object {

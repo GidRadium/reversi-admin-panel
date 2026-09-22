@@ -1,4 +1,4 @@
-package org.gidradium.reversi.domain
+package org.gidradium.reversi.domain.player
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.assertThrows
