@@ -10,13 +10,17 @@ cd reversi-admin-panel
 
 ### Build
 ```bash
-./gradlew build
+./gradlew installDist
 ```
 
-### Run
+### Run GUI
 ```bash
-./gradlew installDist
 ./app/build/install/app/bin/app
+```
+
+### Run CLI
+```bash
+./app/build/install/app/bin/cli
 ```
 
 ### Test
