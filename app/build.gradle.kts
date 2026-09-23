@@ -1,3 +1,6 @@
+import org.gradle.jvm.application.tasks.CreateStartScripts
+import org.gradle.jvm.tasks.Jar
+
 plugins {
     alias(libs.plugins.kotlin.jvm)
     application
@@ -27,5 +30,32 @@ tasks.named<Test>("test") {
 
     testLogging {
         events("passed", "skipped", "failed")
+    }
+}
+
+val cliStartScripts by tasks.registering(CreateStartScripts::class) {
+    applicationName = "cli"
+    mainClass.set("org.gidradium.reversi.presentation.cli.CliMainKt")
+
+    classpath = files(
+        tasks.named<Jar>("jar").flatMap { it.archiveFile },
+        configurations.runtimeClasspath
+    )
+
+    outputDir = layout.buildDirectory
+        .dir("generated/cli-start-scripts")
+        .get()
+        .asFile
+
+    dependsOn("jar")
+}
+
+distributions {
+    main {
+        contents {
+            from(cliStartScripts) {
+                into("bin")
+            }
+        }
     }
 }
