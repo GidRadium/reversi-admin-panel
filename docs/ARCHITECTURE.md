@@ -1,30 +1,61 @@
 ```mermaid
 classDiagram
 
+class MainKt {
+    +main()
+}
+
+class CliMainKt {
+    +main()
+}
+
+class Cli {
+    +run()
+}
+
 class ICliIO {
-    +readLine(): String
+    +readLine(): String?
     +write(message: String)
     +writeLine(message: String)
 }
 
-class IPlayerRepository {
-    +create(name: String): PlayerId
-    +findById(playerId: PlayerId): String
-    +findAll(): Map~PlayerId, String~
-    +delete(playerId: PlayerId)
+class CliIO {
 }
 
-class IGameRepository {
-    +create(whitePlayerId: PlayerId, blackPlayerId: PlayerId, snapshot: GameSnapshot): GameId
-    +update(gameId: GameId, snapshot: GameSnapshot)
-    +findById(gameId: GameId): GameRecord
-    +findAll(): List~GameRecord~
-    +delete(gameId: GameId)
+class Gui {
+    +show()
+}
+
+class PlayerPanel {
+    +refresh()
+}
+
+class GamePanel {
+    +refresh()
+}
+
+class GamesPanel {
+    +refresh()
+}
+
+class GuiViewModel {
+    +state: GuiState
+    +refresh()
+    +createPlayer(name: String): Unit
+    +selectPlayer(playerId: PlayerId)
+    +deleteSelectedPlayer()
+    +createGame(whitePlayerId: PlayerId, blackPlayerId: PlayerId)
+    +selectGame(gameId: GameId)
+    +deleteSelectedGame()
+    +makeMove(position: Position)
+}
+
+class GuiState {
 }
 
 class AdminService {
     +createPlayer(name: String): PlayerId
-    +getPlayer(playerId: PlayerId): String
+    +getPlayer(playerId: PlayerId): String?
     +getPlayers(): Map~PlayerId, String~
     +deletePlayer(playerId: PlayerId)
     +getPlayerStatistics(playerId: PlayerId): PlayerStatistics
@@ -45,11 +76,19 @@ class Game {
     +snapshot(): GameSnapshot
 }
 
-class Cli {
-    +run()
+class IPlayerRepository {
+    +create(name: String): PlayerId
+    +findById(playerId: PlayerId): String?
+    +findAll(): Map~PlayerId, String~
+    +delete(playerId: PlayerId)
 }
 
-class CliIO {
+class IGameRepository {
+    +create(whitePlayerId: PlayerId, blackPlayerId: PlayerId, snapshot: GameSnapshot): GameId
+    +update(gameId: GameId, snapshot: GameSnapshot)
+    +findById(gameId: GameId): GameRecord?
+    +findAll(): List~GameRecord~
+    +delete(gameId: GameId)
 }
 
 class InMemoryPlayerRepository {
@@ -58,13 +97,28 @@ class InMemoryPlayerRepository {
 class InMemoryGameRepository {
 }
 
+MainKt --> Gui
+CliMainKt --> Cli
+
 Cli --> AdminService
 Cli --> ICliIO
 CliIO ..|> ICliIO
 
+Gui --> PlayerPanel
+Gui --> GamePanel
+Gui --> GamesPanel
+Gui --> GuiViewModel
+
+PlayerPanel --> GuiViewModel
+GamePanel --> GuiViewModel
+GamesPanel --> GuiViewModel
+
+GuiViewModel --> GuiState
+GuiViewModel --> AdminService
+
+AdminService --> Game
 AdminService --> IPlayerRepository
 AdminService --> IGameRepository
-AdminService --> Game
 
 InMemoryPlayerRepository ..|> IPlayerRepository
 InMemoryGameRepository ..|> IGameRepository

@@ -23,6 +23,17 @@ class GameRecord {
     +snapshot: GameSnapshot
 }
 
+class GuiState {
+    +players: Map~PlayerId, String~
+    +games: List~GameRecord~
+    +selectedPlayerId: PlayerId
+    +selectedGameId: GameId
+    +selectedPlayerStatistics: PlayerStatistics
+    +availableMoves: Set~Position~
+    +lastMoveEvaluation: MoveEvaluation
+    +message: String
+}
+
 class GameSnapshot {
     +board: List~List~Cell~~
     +currentPlayer: PlayerColor
@@ -80,6 +91,13 @@ GameRecord --> GameId
 GameRecord --> PlayerId
 GameRecord --> GameSnapshot
 
+GuiState --> PlayerId
+GuiState --> GameId
+GuiState --> PlayerStatistics
+GuiState --> GameRecord
+GuiState --> Position
+GuiState --> MoveEvaluation
+
 GameSnapshot --> Cell
 GameSnapshot --> PlayerColor
 GameSnapshot --> GameStatus
@@ -92,6 +110,7 @@ Board --> Cell
 Board --> Position
 
 MoveEvaluation --> Position
+
 GameProgress --> PlayerColor
 GameProgress --> GameStatus
 ```

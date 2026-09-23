@@ -1,6 +1,7 @@
 # reversi-admin-panel
 CLI and GUI reversi games validator. Written in Kotlin.
 
+## Usage
 
 ### Clone
 ```bash
@@ -27,3 +28,17 @@ cd reversi-admin-panel
 ```bash
 ./gradlew test
 ```
+
+## Architecture
+
+### Main architecture
+
+![Main architecture](docs/ARCHITECTURE.png)
+
+[Mermaid source](docs/ARCHITECTURE.md)
+
+### Data model
+
+![Data model](docs/ARCHITECTURE_DATA.png)
+
+[Mermaid source](docs/ARCHITECTURE_DATA.md)
