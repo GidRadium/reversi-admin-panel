@@ -12,8 +12,8 @@ flowchart TD
 
     Service["AdminService"]
 
-    Game["Game<br/>Владеет состоянием игры<br/>и единственный изменяет его"]
-    Rules["ReversiRules<br/>Проверяет ходы и вычисляет последствия<br/>Не изменяет состояние"]
+    Game["Game<br/>Owns the game state<br/>and is the only class that modifies it"]
+    Rules["ReversiRules<br/>Validates moves and calculates consequences<br/>Does not modify state"]
 
     PlayerRepository["IPlayerRepository"]
     GameRepository["IGameRepository"]
@@ -31,5 +31,5 @@ flowchart TD
     Service --> PlayerRepository
     Service --> GameRepository
 
-    Game -->|исполняет решения| Rules
+    Game -->|executes decisions| Rules
 ```

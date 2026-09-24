@@ -1,5 +1,13 @@
 # reversi-admin-panel
-CLI and GUI reversi games validator. Written in Kotlin.
+CLI and GUI application for managing Reversi games. Written in Kotlin.
+
+## Features
+
+- Player management.
+- Reversi game management.
+- Game history and player statistics.
+- Persistent storage in SQLite.
+- CLI and GUI access to the same data.
 
 ## Usage
 
@@ -33,6 +41,22 @@ cd reversi-admin-panel
 ```bash
 ./gradlew test
 ```
+
+The test suite contains unit, integration, regression and system tests.
+
+### Database
+
+The application uses SQLite for persistent storage.
+
+The database is created automatically on startup and is stored locally in:
+
+```text
+data/reversi.db
+```
+
+The database stores players, games and game move history.
+
+The CLI and GUI use the same database.
 
 ## Architecture
 
