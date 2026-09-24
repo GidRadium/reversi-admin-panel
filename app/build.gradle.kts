@@ -63,3 +63,11 @@ distributions {
         }
     }
 }
+
+tasks.register<JavaExec>("runCli") {
+    group = "application"
+    description = "Runs the CLI application"
+
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass.set("org.gidradium.reversi.presentation.cli.CliMainKt")
+}
