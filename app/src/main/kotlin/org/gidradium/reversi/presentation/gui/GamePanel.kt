@@ -18,13 +18,22 @@ import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.JTextArea
 
+private const val BOARD_SIZE = 8
+private const val CELL_SIZE = 60
+
+private const val PANEL_GAP = 8
+private const val PANEL_PADDING = 10
+private const val BOARD_GAP = 2
+private const val HISTORY_ROWS = 5
+
+private val AVAILABLE_CELL_COLOR = Color(166, 220, 170)
+private val UNAVAILABLE_CELL_COLOR = Color(210, 190, 160)
+private val CELL_BORDER_COLOR = Color.DARK_GRAY
+
 class GamePanel(
     private val viewModel: GuiViewModel,
     private val onChanged: () -> Unit
-) : JPanel(BorderLayout(8, 8)) {
-
-    private val availableCellColor = Color(166, 220, 170)
-    private val unavailableCellColor = Color(210, 190, 160)
+) : JPanel(BorderLayout(PANEL_GAP, PANEL_GAP)) {
 
     private val whitePlayerBox = JComboBox<String>()
     private val blackPlayerBox = JComboBox<String>()
@@ -33,17 +42,22 @@ class GamePanel(
     private val scoreLabel = JLabel(" ")
     private val historyArea = JTextArea()
 
-    private val boardButtons = Array(8) { row ->
-        Array(8) { column ->
+    private val boardButtons = Array(BOARD_SIZE) { row ->
+        Array(BOARD_SIZE) { column ->
             createBoardButton(row, column)
         }
     }
 
     init {
-        border = BorderFactory.createEmptyBorder(10, 10, 10, 10)
+        border = BorderFactory.createEmptyBorder(
+            PANEL_PADDING,
+            PANEL_PADDING,
+            PANEL_PADDING,
+            PANEL_PADDING
+        )
 
         historyArea.isEditable = false
-        historyArea.rows = 5
+        historyArea.rows = HISTORY_ROWS
 
         add(createControls(), BorderLayout.NORTH)
         add(createCenterPanel(), BorderLayout.CENTER)
@@ -56,7 +70,9 @@ class GamePanel(
     }
 
     private fun createControls(): JPanel {
-        val panel = JPanel(GridLayout(2, 3, 8, 8))
+        val panel = JPanel(
+            GridLayout(2, 3, PANEL_GAP, PANEL_GAP)
+        )
 
         panel.add(JLabel("White"))
         panel.add(JLabel("Black"))
@@ -66,7 +82,6 @@ class GamePanel(
         panel.add(blackPlayerBox)
 
         val createGameButton = JButton("Create game")
-
         createGameButton.addActionListener {
             createGame()
         }
@@ -77,13 +92,20 @@ class GamePanel(
     }
 
     private fun createCenterPanel(): JPanel {
-        val panel = JPanel(BorderLayout(8, 8))
+        val panel = JPanel(
+            BorderLayout(PANEL_GAP, PANEL_GAP)
+        )
 
-        val information = JPanel(GridLayout(2, 1))
-        information.add(statusLabel)
-        information.add(scoreLabel)
+        val informationPanel = JPanel(
+            GridLayout(2, 1)
+        )
 
-        val boardPanel = JPanel(GridLayout(8, 8, 2, 2))
+        informationPanel.add(statusLabel)
+        informationPanel.add(scoreLabel)
+
+        val boardPanel = JPanel(
+            GridLayout(BOARD_SIZE, BOARD_SIZE, BOARD_GAP, BOARD_GAP)
+        )
 
         for (row in boardButtons.indices) {
             for (column in boardButtons[row].indices) {
@@ -91,7 +113,7 @@ class GamePanel(
             }
         }
 
-        panel.add(information, BorderLayout.NORTH)
+        panel.add(informationPanel, BorderLayout.NORTH)
         panel.add(boardPanel, BorderLayout.CENTER)
 
         return panel
@@ -100,16 +122,16 @@ class GamePanel(
     private fun createBoardButton(
         row: Int,
         column: Int
-    ): JButton {
-        return JButton().apply {
-            preferredSize = Dimension(60, 60)
+    ): JButton =
+        JButton().apply {
+            preferredSize = Dimension(CELL_SIZE, CELL_SIZE)
 
             isFocusPainted = false
             isContentAreaFilled = true
             isBorderPainted = true
             isOpaque = true
 
-            border = BorderFactory.createLineBorder(Color.DARK_GRAY)
+            border = BorderFactory.createLineBorder(CELL_BORDER_COLOR)
 
             addActionListener {
                 try {
@@ -120,20 +142,16 @@ class GamePanel(
                 }
             }
         }
-    }
 
     private fun refreshPlayerBoxes() {
-        val players = viewModel.state.players
+        val playerNames = viewModel.state.players
+            .map { (playerId, name) ->
+                "#${playerId.value}: $name"
+            }
+            .toTypedArray()
 
-        val playerNames = players.map { (playerId, name) ->
-            "#${playerId.value}: $name"
-        }
-
-        whitePlayerBox.model =
-            DefaultComboBoxModel(playerNames.toTypedArray())
-
-        blackPlayerBox.model =
-            DefaultComboBoxModel(playerNames.toTypedArray())
+        whitePlayerBox.model = DefaultComboBoxModel(playerNames)
+        blackPlayerBox.model = DefaultComboBoxModel(playerNames)
     }
 
     private fun createGame() {
@@ -150,7 +168,6 @@ class GamePanel(
                 whitePlayerId = whitePlayerId,
                 blackPlayerId = blackPlayerId
             )
-
             onChanged()
         } catch (exception: IllegalArgumentException) {
             showError(exception.message)
@@ -185,14 +202,11 @@ class GamePanel(
         val blackPieces = countCells(snapshot.board, Cell.BLACK)
         val whitePieces = countCells(snapshot.board, Cell.WHITE)
 
-        scoreLabel.text =
-            "Black: $blackPieces    White: $whitePieces"
+        scoreLabel.text = "Black: $blackPieces    White: $whitePieces"
 
         historyArea.text = snapshot.history
             .mapIndexed { index, move ->
-                "${index + 1}. " +
-                        "${move.player}: " +
-                        formatPosition(move.position)
+                "${index + 1}. ${move.player}: ${formatPosition(move.position)}"
             }
             .joinToString("\n")
 
@@ -206,23 +220,24 @@ class GamePanel(
             for (column in board[row].indices) {
                 val position = Position(row, column)
                 val button = boardButtons[row][column]
-                val cell = board[row][column]
 
-                button.background = when (cell) {
+                button.background = when (board[row][column]) {
                     Cell.BLACK -> Color.BLACK
                     Cell.WHITE -> Color.WHITE
-                    Cell.EMPTY ->
-                        if (position in viewModel.state.availableMoves) {
-                            availableCellColor
-                        } else {
-                            unavailableCellColor
-                        }
+                    Cell.EMPTY -> getEmptyCellColor(position)
                 }
 
                 button.isEnabled = gameSelected
             }
         }
     }
+
+    private fun getEmptyCellColor(position: Position): Color =
+        if (position in viewModel.state.availableMoves) {
+            AVAILABLE_CELL_COLOR
+        } else {
+            UNAVAILABLE_CELL_COLOR
+        }
 
     private fun clearGame() {
         statusLabel.text = "No game selected"
@@ -233,7 +248,7 @@ class GamePanel(
             for (column in boardButtons[row].indices) {
                 val button = boardButtons[row][column]
 
-                button.background = unavailableCellColor
+                button.background = UNAVAILABLE_CELL_COLOR
                 button.isEnabled = false
             }
         }
@@ -242,13 +257,13 @@ class GamePanel(
     private fun selectedPlayerId(
         comboBox: JComboBox<String>
     ): PlayerId? {
-        val index = comboBox.selectedIndex
+        val selectedIndex = comboBox.selectedIndex
 
-        if (index < 0) {
+        if (selectedIndex < 0) {
             return null
         }
 
-        return viewModel.state.players.keys.elementAt(index)
+        return viewModel.state.players.keys.elementAt(selectedIndex)
     }
 
     private fun countCells(

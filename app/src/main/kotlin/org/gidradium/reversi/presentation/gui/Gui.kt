@@ -4,6 +4,12 @@ import java.awt.BorderLayout
 import java.awt.Dimension
 import javax.swing.JFrame
 
+private const val MIN_WINDOW_WIDTH = 1100
+private const val MIN_WINDOW_HEIGHT = 700
+
+private const val WINDOW_WIDTH = 1200
+private const val WINDOW_HEIGHT = 750
+
 class Gui(
     private val viewModel: GuiViewModel
 ) {
@@ -28,20 +34,35 @@ class Gui(
     fun show() {
         viewModel.refresh()
 
-        frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
-        frame.minimumSize = Dimension(1100, 700)
-        frame.setSize(1200, 750)
-        frame.setLocationRelativeTo(null)
+        configureFrame()
+        addPanels()
+        refreshAll()
 
+        frame.isVisible = true
+    }
+
+    private fun configureFrame() {
+        frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
+
+        frame.minimumSize = Dimension(
+            MIN_WINDOW_WIDTH,
+            MIN_WINDOW_HEIGHT
+        )
+
+        frame.setSize(
+            WINDOW_WIDTH,
+            WINDOW_HEIGHT
+        )
+
+        frame.setLocationRelativeTo(null)
+    }
+
+    private fun addPanels() {
         frame.layout = BorderLayout()
 
         frame.add(playersPanel, BorderLayout.WEST)
         frame.add(gamePanel, BorderLayout.CENTER)
         frame.add(gamesPanel, BorderLayout.EAST)
-
-        refreshAll()
-
-        frame.isVisible = true
     }
 
     private fun refreshAll() {

@@ -13,10 +13,14 @@ import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.ListSelectionModel
 
+private const val PANEL_GAP = 8
+private const val PANEL_PADDING = 10
+private const val PANEL_WIDTH = 260
+
 class GamesPanel(
     private val viewModel: GuiViewModel,
     private val onChanged: () -> Unit
-) : JPanel(BorderLayout(8, 8)) {
+) : JPanel(BorderLayout(PANEL_GAP, PANEL_GAP)) {
 
     private val gameListModel = DefaultListModel<String>()
     private val gameList = JList(gameListModel)
@@ -24,8 +28,13 @@ class GamesPanel(
     private var refreshing = false
 
     init {
-        border = BorderFactory.createEmptyBorder(10, 10, 10, 10)
-        preferredSize = Dimension(260, 0)
+        border = BorderFactory.createEmptyBorder(
+            PANEL_PADDING,
+            PANEL_PADDING,
+            PANEL_PADDING,
+            PANEL_PADDING
+        )
+        preferredSize = Dimension(PANEL_WIDTH, 0)
 
         createGameList()
         createDeleteButton()
@@ -55,12 +64,12 @@ class GamesPanel(
             }
 
             if (selectedGameId != null) {
-                val index = viewModel.state.games.indexOfFirst {
+                val selectedIndex = viewModel.state.games.indexOfFirst {
                     it.id == selectedGameId
                 }
 
-                if (index >= 0) {
-                    gameList.selectedIndex = index
+                if (selectedIndex >= 0) {
+                    gameList.selectedIndex = selectedIndex
                 }
             }
         } finally {
@@ -76,10 +85,10 @@ class GamesPanel(
                 return@addListSelectionListener
             }
 
-            val index = gameList.selectedIndex
+            val selectedIndex = gameList.selectedIndex
 
-            if (index >= 0) {
-                viewModel.selectGame(gameIdAt(index))
+            if (selectedIndex >= 0) {
+                viewModel.selectGame(gameIdAt(selectedIndex))
                 onChanged()
             }
         }

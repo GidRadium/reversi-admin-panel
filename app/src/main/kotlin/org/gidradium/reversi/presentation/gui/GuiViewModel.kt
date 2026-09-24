@@ -99,22 +99,22 @@ class GuiViewModel(
             "No game selected"
         }
 
-        val result = adminService.makeMove(
+        val moveEvaluation = adminService.makeMove(
             gameId = gameId,
             position = position
         )
 
         state = state.copy(
-            availableMoves = if (result.isValid) {
+            availableMoves = if (moveEvaluation.isValid) {
                 adminService.getAvailableMoves(gameId)
             } else {
                 state.availableMoves
             },
-            lastMoveEvaluation = result,
-            message = if (result.isValid) {
+            lastMoveEvaluation = moveEvaluation,
+            message = if (moveEvaluation.isValid) {
                 "Move accepted"
             } else {
-                "Move rejected: ${result.reason}"
+                "Move rejected: ${moveEvaluation.reason}"
             },
             games = adminService.getGames()
         )

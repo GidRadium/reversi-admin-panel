@@ -15,10 +15,14 @@ import javax.swing.JScrollPane
 import javax.swing.JTextField
 import javax.swing.ListSelectionModel
 
+private const val PANEL_GAP = 8
+private const val PANEL_PADDING = 10
+private const val PANEL_WIDTH = 260
+
 class PlayersPanel(
     private val viewModel: GuiViewModel,
     private val onChanged: () -> Unit
-) : JPanel(BorderLayout(8, 8)) {
+) : JPanel(BorderLayout(PANEL_GAP, PANEL_GAP)) {
 
     private val playerListModel = DefaultListModel<String>()
     private val playerList = JList(playerListModel)
@@ -29,8 +33,13 @@ class PlayersPanel(
     private var refreshing = false
 
     init {
-        border = BorderFactory.createEmptyBorder(10, 10, 10, 10)
-        preferredSize = Dimension(260, 0)
+        border = BorderFactory.createEmptyBorder(
+            PANEL_PADDING,
+            PANEL_PADDING,
+            PANEL_PADDING,
+            PANEL_PADDING
+        )
+        preferredSize = Dimension(PANEL_WIDTH, 0)
 
         createPlayerList()
         createButtons()
@@ -54,10 +63,11 @@ class PlayersPanel(
             }
 
             if (selectedPlayerId != null) {
-                val index = viewModel.state.players.keys.indexOf(selectedPlayerId)
+                val selectedIndex = viewModel.state.players.keys
+                    .indexOf(selectedPlayerId)
 
-                if (index >= 0) {
-                    playerList.selectedIndex = index
+                if (selectedIndex >= 0) {
+                    playerList.selectedIndex = selectedIndex
                 }
             }
 
@@ -75,12 +85,10 @@ class PlayersPanel(
                 return@addListSelectionListener
             }
 
-            val index = playerList.selectedIndex
+            val selectedIndex = playerList.selectedIndex
 
-            if (index >= 0) {
-                val playerId = playerIdAt(index)
-
-                viewModel.selectPlayer(playerId)
+            if (selectedIndex >= 0) {
+                viewModel.selectPlayer(playerIdAt(selectedIndex))
                 refreshStatistics()
             }
         }
@@ -88,25 +96,40 @@ class PlayersPanel(
 
     private fun createButtons() {
         val createButton = JButton("Create")
-
         createButton.addActionListener {
             createPlayer()
         }
 
         val deleteButton = JButton("Delete")
-
         deleteButton.addActionListener {
             deletePlayer()
         }
 
-        val buttons = JPanel(GridLayout(1, 2, 8, 8))
-        buttons.add(createButton)
-        buttons.add(deleteButton)
+        val buttonsPanel = JPanel(
+            GridLayout(1, 2, PANEL_GAP, PANEL_GAP)
+        )
 
-        val bottomPanel = JPanel(BorderLayout(8, 8))
-        bottomPanel.add(nameField, BorderLayout.CENTER)
-        bottomPanel.add(buttons, BorderLayout.SOUTH)
-        bottomPanel.add(statisticsLabel, BorderLayout.NORTH)
+        buttonsPanel.add(createButton)
+        buttonsPanel.add(deleteButton)
+
+        val bottomPanel = JPanel(
+            BorderLayout(PANEL_GAP, PANEL_GAP)
+        )
+
+        bottomPanel.add(
+            statisticsLabel,
+            BorderLayout.NORTH
+        )
+
+        bottomPanel.add(
+            nameField,
+            BorderLayout.CENTER
+        )
+
+        bottomPanel.add(
+            buttonsPanel,
+            BorderLayout.SOUTH
+        )
 
         add(bottomPanel, BorderLayout.SOUTH)
     }
@@ -116,7 +139,6 @@ class PlayersPanel(
             val name = nameField.text.trim()
 
             viewModel.createPlayer(name)
-
             nameField.text = ""
 
             onChanged()

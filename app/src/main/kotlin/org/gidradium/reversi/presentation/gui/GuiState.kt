@@ -10,10 +10,13 @@ import org.gidradium.reversi.game.Position
 data class GuiState(
     val players: Map<PlayerId, String> = emptyMap(),
     val games: List<GameRecord> = emptyList(),
+
     val selectedPlayerId: PlayerId? = null,
-    val selectedGameId: GameId? = null,
     val selectedPlayerStatistics: PlayerStatistics? = null,
+
+    val selectedGameId: GameId? = null,
     val availableMoves: Set<Position> = emptySet(),
     val lastMoveEvaluation: MoveEvaluation? = null,
+
     val message: String = ""
 )
