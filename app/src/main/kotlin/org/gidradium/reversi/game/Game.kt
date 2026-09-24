@@ -84,4 +84,21 @@ class Game(
             PlayerColor.BLACK -> Cell.BLACK
             PlayerColor.WHITE -> Cell.WHITE
         }
+
+    companion object {
+        fun fromSnapshot(
+            snapshot: GameSnapshot,
+            rules: ReversiRules = ReversiRules()
+        ): Game {
+            val game = Game(rules)
+
+            game.board.restore(snapshot.board)
+            game.history.addAll(snapshot.history)
+            game.currentPlayer = snapshot.currentPlayer
+            game.status = snapshot.status
+            game.winner = snapshot.winner
+
+            return game
+        }
+    }
 }
