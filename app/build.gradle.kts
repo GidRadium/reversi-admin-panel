@@ -11,6 +11,10 @@ repositories {
 }
 
 dependencies {
+    implementation(libs.exposed.core)
+    implementation(libs.exposed.jdbc)
+    implementation(libs.sqlite.jdbc)
+
     testImplementation(libs.junit.jupiter)
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
@@ -58,4 +62,12 @@ distributions {
             }
         }
     }
+}
+
+tasks.register<JavaExec>("runCli") {
+    group = "application"
+    description = "Runs the CLI application"
+
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass.set("org.gidradium.reversi.presentation.cli.CliMainKt")
 }

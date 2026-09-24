@@ -16,6 +16,12 @@ class AdminService(
 
     private val activeGames = mutableMapOf<GameId, Game>()
 
+    init {
+        gameRepository.findAll().forEach { record ->
+            activeGames[record.id] = Game.fromSnapshot(record.snapshot)
+        }
+    }
+
     fun createPlayer(name: String): PlayerId =
         playerRepository.create(name)
 

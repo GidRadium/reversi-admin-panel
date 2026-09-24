@@ -28,6 +28,22 @@ class Board {
     fun snapshot(): List<List<Cell>> =
         cells.map { it.toList() }
 
+    internal fun restore(snapshot: List<List<Cell>>) {
+        require(snapshot.size == SIZE) {
+            "Board must have $SIZE rows"
+        }
+
+        require(snapshot.all { it.size == SIZE }) {
+            "Each board row must have $SIZE cells"
+        }
+
+        for (row in 0 until SIZE) {
+            for (column in 0 until SIZE) {
+                cells[row][column] = snapshot[row][column]
+            }
+        }
+    }
+
     companion object {
         const val SIZE = 8
     }

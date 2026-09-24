@@ -1,125 +1,35 @@
 ```mermaid
-classDiagram
+flowchart TD
 
-class MainKt {
-    +main()
-}
+    Main["MainKt"]
+    CliMain["CliMainKt"]
 
-class CliMainKt {
-    +main()
-}
+    GUI["GUI"]
+    CLI["CLI"]
 
-class Cli {
-    +run()
-}
+    ViewModel["GuiViewModel"]
+    CliController["Cli"]
 
-class ICliIO {
-    +readLine(): String?
-    +write(message: String)
-    +writeLine(message: String)
-}
+    Service["AdminService"]
 
-class CliIO {
-}
+    Game["Game<br/>Owns the game state<br/>and is the only class that modifies it"]
+    Rules["ReversiRules<br/>Validates moves and calculates consequences<br/>Does not modify state"]
 
-class Gui {
-    +show()
-}
+    PlayerRepository["IPlayerRepository"]
+    GameRepository["IGameRepository"]
 
-class PlayerPanel {
-    +refresh()
-}
+    Main --> GUI
+    CliMain --> CLI
 
-class GamePanel {
-    +refresh()
-}
+    GUI --> ViewModel
+    CLI --> CliController
 
-class GamesPanel {
-    +refresh()
-}
+    ViewModel --> Service
+    CliController --> Service
 
-class GuiViewModel {
-    +state: GuiState
-    +refresh()
-    +createPlayer(name: String): Unit
-    +selectPlayer(playerId: PlayerId)
-    +deleteSelectedPlayer()
-    +createGame(whitePlayerId: PlayerId, blackPlayerId: PlayerId)
-    +selectGame(gameId: GameId)
-    +deleteSelectedGame()
-    +makeMove(position: Position)
-}
+    Service --> Game
+    Service --> PlayerRepository
+    Service --> GameRepository
 
-class GuiState {
-}
-
-class AdminService {
-    +createPlayer(name: String): PlayerId
-    +getPlayer(playerId: PlayerId): String?
-    +getPlayers(): Map~PlayerId, String~
-    +deletePlayer(playerId: PlayerId)
-    +getPlayerStatistics(playerId: PlayerId): PlayerStatistics
-    +createGame(whitePlayerId: PlayerId, blackPlayerId: PlayerId): GameId
-    +deleteGame(gameId: GameId)
-    +validateMove(gameId: GameId, position: Position): MoveEvaluation
-    +makeMove(gameId: GameId, position: Position): MoveEvaluation
-    +getAvailableMoves(gameId: GameId): Set~Position~
-    +getGameSnapshot(gameId: GameId): GameSnapshot
-    +getGameRecord(gameId: GameId): GameRecord
-    +getGames(): List~GameRecord~
-}
-
-class Game {
-    +validateMove(position: Position): MoveEvaluation
-    +availableMoves(): Set~Position~
-    +makeMove(position: Position): MoveEvaluation
-    +snapshot(): GameSnapshot
-}
-
-class IPlayerRepository {
-    +create(name: String): PlayerId
-    +findById(playerId: PlayerId): String?
-    +findAll(): Map~PlayerId, String~
-    +delete(playerId: PlayerId)
-}
-
-class IGameRepository {
-    +create(whitePlayerId: PlayerId, blackPlayerId: PlayerId, snapshot: GameSnapshot): GameId
-    +update(gameId: GameId, snapshot: GameSnapshot)
-    +findById(gameId: GameId): GameRecord?
-    +findAll(): List~GameRecord~
-    +delete(gameId: GameId)
-}
-
-class InMemoryPlayerRepository {
-}
-
-class InMemoryGameRepository {
-}
-
-MainKt --> Gui
-CliMainKt --> Cli
-
-Cli --> AdminService
-Cli --> ICliIO
-CliIO ..|> ICliIO
-
-Gui --> PlayerPanel
-Gui --> GamePanel
-Gui --> GamesPanel
-Gui --> GuiViewModel
-
-PlayerPanel --> GuiViewModel
-GamePanel --> GuiViewModel
-GamesPanel --> GuiViewModel
-
-GuiViewModel --> GuiState
-GuiViewModel --> AdminService
-
-AdminService --> Game
-AdminService --> IPlayerRepository
-AdminService --> IGameRepository
-
-InMemoryPlayerRepository ..|> IPlayerRepository
-InMemoryGameRepository ..|> IGameRepository
+    Game -->|executes decisions| Rules
 ```

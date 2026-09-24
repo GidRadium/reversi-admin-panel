@@ -260,4 +260,71 @@ class AdminServiceTest {
         assertFalse(result.isValid)
         assertEquals(before, after)
     }
+
+    @Test
+    fun `player statistics count unfinished game as played`() {
+        val service = createService()
+
+        val whiteId = service.createPlayer("Alice")
+        val blackId = service.createPlayer("Bob")
+
+        service.createGame(
+            whitePlayerId = whiteId,
+            blackPlayerId = blackId
+        )
+
+        val statistics = service.getPlayerStatistics(whiteId)
+
+        assertEquals(1, statistics.gamesPlayed)
+        assertEquals(0, statistics.wins)
+        assertEquals(0, statistics.losses)
+        assertEquals(0, statistics.draws)
+    }
+
+    @Test
+    fun `player statistics count finished draw`() {
+        val playerRepository = InMemoryPlayerRepository()
+        val gameRepository = InMemoryGameRepository()
+        val service = AdminService(playerRepository, gameRepository)
+
+        val whiteId = service.createPlayer("Alice")
+        val blackId = service.createPlayer("Bob")
+
+        val drawnGame = GameSnapshot(
+            board = Board().snapshot(),
+            currentPlayer = PlayerColor.BLACK,
+            history = emptyList(),
+            status = GameStatus.FINISHED,
+            winner = null
+        )
+
+        gameRepository.create(
+            whitePlayerId = whiteId,
+            blackPlayerId = blackId,
+            snapshot = drawnGame
+        )
+
+        val whiteStatistics = service.getPlayerStatistics(whiteId)
+        val blackStatistics = service.getPlayerStatistics(blackId)
+
+        assertEquals(
+            PlayerStatistics(
+                gamesPlayed = 1,
+                wins = 0,
+                losses = 0,
+                draws = 1
+            ),
+            whiteStatistics
+        )
+
+        assertEquals(
+            PlayerStatistics(
+                gamesPlayed = 1,
+                wins = 0,
+                losses = 0,
+                draws = 1
+            ),
+            blackStatistics
+        )
+    }
 }

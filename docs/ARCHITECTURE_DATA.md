@@ -1,116 +1,31 @@
 ```mermaid
-classDiagram
+erDiagram
 
-class PlayerId {
-    +value: Int
-}
+    PLAYERS {
+        INTEGER id PK
+        VARCHAR name
+    }
 
-class GameId {
-    +value: Int
-}
+    GAMES {
+        INTEGER id PK
+        INTEGER white_player_id FK
+        INTEGER black_player_id FK
+        VARCHAR board
+        VARCHAR current_player
+        VARCHAR status
+        VARCHAR winner
+    }
 
-class PlayerStatistics {
-    +gamesPlayed: Int
-    +wins: Int
-    +losses: Int
-    +draws: Int
-}
+    MOVES {
+        INTEGER id PK
+        INTEGER game_id FK
+        INTEGER move_number
+        INTEGER row
+        INTEGER column
+        VARCHAR player
+    }
 
-class GameRecord {
-    +id: GameId
-    +whitePlayerId: PlayerId
-    +blackPlayerId: PlayerId
-    +snapshot: GameSnapshot
-}
-
-class GuiState {
-    +players: Map~PlayerId, String~
-    +games: List~GameRecord~
-    +selectedPlayerId: PlayerId
-    +selectedGameId: GameId
-    +selectedPlayerStatistics: PlayerStatistics
-    +availableMoves: Set~Position~
-    +lastMoveEvaluation: MoveEvaluation
-    +message: String
-}
-
-class GameSnapshot {
-    +board: List~List~Cell~~
-    +currentPlayer: PlayerColor
-    +history: List~Move~
-    +status: GameStatus
-    +winner: PlayerColor
-}
-
-class Board {
-    +cells: Cell[][]
-}
-
-class Position {
-    +row: Int
-    +column: Int
-}
-
-class Move {
-    +position: Position
-    +player: PlayerColor
-}
-
-class MoveEvaluation {
-    +isValid: Boolean
-    +flippedCells: List~Position~
-    +reason: String
-}
-
-class GameProgress {
-    +currentPlayer: PlayerColor
-    +status: GameStatus
-    +winner: PlayerColor
-}
-
-class Cell {
-    <<enumeration>>
-    EMPTY
-    BLACK
-    WHITE
-}
-
-class PlayerColor {
-    <<enumeration>>
-    BLACK
-    WHITE
-}
-
-class GameStatus {
-    <<enumeration>>
-    IN_PROGRESS
-    FINISHED
-}
-
-GameRecord --> GameId
-GameRecord --> PlayerId
-GameRecord --> GameSnapshot
-
-GuiState --> PlayerId
-GuiState --> GameId
-GuiState --> PlayerStatistics
-GuiState --> GameRecord
-GuiState --> Position
-GuiState --> MoveEvaluation
-
-GameSnapshot --> Cell
-GameSnapshot --> PlayerColor
-GameSnapshot --> GameStatus
-GameSnapshot --> Move
-
-Move --> Position
-Move --> PlayerColor
-
-Board --> Cell
-Board --> Position
-
-MoveEvaluation --> Position
-
-GameProgress --> PlayerColor
-GameProgress --> GameStatus
+    PLAYERS ||--o{ GAMES : "white player"
+    PLAYERS ||--o{ GAMES : "black player"
+    GAMES ||--o{ MOVES : "contains"
 ```

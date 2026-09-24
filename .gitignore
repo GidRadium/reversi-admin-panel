@@ -25,3 +25,6 @@ build
 
 # Ignore Kotlin plugin data
 .kotlin
+
+app/data/
+data/
